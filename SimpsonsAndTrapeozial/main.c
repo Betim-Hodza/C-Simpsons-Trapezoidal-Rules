@@ -1,4 +1,7 @@
+// to compile: gcc main.c tinyexpr-master/tinyexpr.c -lm
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <ctype.h>
 #include <string.h>
@@ -125,7 +128,7 @@ double simpsonsApprox(int N, int b, int a, char* function, double deltaX)
 
         if (i == N - 1)
         {
-            // First and second-to-last terms are multiplied by 4
+            //second-to-last terms are multiplied by 4
             sum += 4 * f_x;
         }
         else if (i % 2 == 0)
@@ -142,22 +145,78 @@ double simpsonsApprox(int N, int b, int a, char* function, double deltaX)
     }
 
     // Combine the terms
-    sum = deltaX * sum / 3;
+    sum = (deltaX / 3) * sum;
 
     return sum;
 }
 
 double trapezoidalApprox(int N, int b, int a, char* function, double deltaX)
 {
+    //initialize
+    double sum = 0.0;
+    int err;
 
+    //compile expression 1
+    double x = a;
+    te_variable vars1[] = {{"x", &x}};
+    te_expr *expr1 = te_compile(function, vars1, 1, &err);
+    double f_a = te_eval(expr1); //returns expression value
+    
+    //compile expression 2
+    x = b;
+    te_variable vars2[] = {{"x", &x}};
+    te_expr *expr2 = te_compile(function, vars2, 1, &err);
+    double f_b = te_eval(expr2);
+
+    printf("f_a: %f, f_b: %f\n", f_a, f_b);
+
+    sum += f_a + f_b; // Add the first and last terms
+    
+    printf("current sum: %f\n", sum);
+
+    //free expressions
+    free(expr1);
+    free(expr2);
+
+    for (int i = 1; i < N; i++)
+    {
+        x = a + i * deltaX;
+        te_variable vars3[] = {{"x", &x}};
+        //compile expression 2
+        te_expr *expr3 = te_compile(function, vars3, 1, &err);
+
+        double f_x = te_eval(expr3);
+
+        if (i > 1 || i < (N-1))
+        {
+            // multiply inner terms by 2 (except the second-to-last and first)
+            sum += 2 * f_x;
+        }
+        // free the expression
+        free(expr3);
+    }
+
+    // Combine the terms
+    sum = (deltaX / 2) * sum;
+
+    return sum;
 }
 
 void printMenu()
 {
     printf("Simpsons & Trapezoidal Algorithm\n");
+    printf("choose a number out of the list:\n");
     printf("1. Simpsons\n");
     printf("2. Trapezoidal\n");
-    printf("Please input the algorithm you want to use: (i.e. 1 for simpsons)\n");
+    printf("Please input the algorithm you want to use: \n");
+}
+
+void printingNote()
+{
+    printf("\nNote, when inputting a function you can write it like this: e.g. x + x^2 or (x*5)^2 or (x * 5) / 2. \n");
+    printf("Parenthesis work as intented\n");
+    printf("Factorials work fac 5 == 120\n");
+    printf("the following constants work pi, e\n");
 }
 
 int main()
@@ -197,9 +256,11 @@ int main()
             }
         }
     }
-    
+
+    printingNote();
 
     printf("\nPlease input the function you want to integrate (max chars = %d)\n", MAX_FUNC_SIZE);
+
     //get function with whitespace
     scanf("%[^\n]s", function);
 
@@ -224,7 +285,7 @@ int main()
     else 
     {
         double sum = trapezoidalApprox(N, b, a, function, deltaX); 
-        printf("Aproximation of the integral from %d-%d of %s = %f\n", a, b, function, sum);
+        printf("Trapizoidal Aproximation of the integral from %d-%d of %s = %f\n", a, b, function, sum);
     }
 
     return 0;
