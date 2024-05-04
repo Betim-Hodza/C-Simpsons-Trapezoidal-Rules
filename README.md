@@ -30,7 +30,7 @@ This is a C program that uses the tinyexpr library to parse through mathmatical 
 * First you need to clone this repo
 * then run this command
 ```
-gh repo clone Betim-Hodza/Movie-Theater-Management-System
+gh repo clone Betim-Hodza/Simpsons-Trapezoidal-Rules
 cd SimpsonsAndTrapezoidal
 gcc main.c tinyexpr-master/tinyexpr.c -lm
 ./a.out
