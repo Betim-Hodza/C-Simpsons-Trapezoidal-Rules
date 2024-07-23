@@ -69,3 +69,16 @@ let avgExpression = NSExpression(forFunction: "min:", arguments: [numbersExpress
 if let answ = avgExpression.expressionValue(with: nil, context: nil) as? Double {
     print("result: \(answ)")
 }
+
+// non related to math but still really cool!
+
+let word = "meDiUm"
+let wordExpression = NSExpression(forConstantValue: word)
+
+let exprss = NSExpression(forFunction: "uppercase:", arguments: [wordExpression])
+
+if let ans = exprss.expressionValue(with: nil, context: nil) as? String {
+    print(ans)
+} else {
+    print("Error")
+}
